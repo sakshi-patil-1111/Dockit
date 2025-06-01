@@ -68,6 +68,60 @@ const Navbar = () => {
             Create Account
           </button>
         )}
+
+        <img
+          onClick={() => setShowMenu(true)}
+          className="w-6 md:hidden"
+          src={assets.menu_icon}
+          alt=""
+        />
+
+        <div
+          className={`md:hidden right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all ${
+            showMenu ? "w-full fixed" : "h-0 w-0"
+          }`}
+        >
+          <div className="flex items-center justify-between px-5 py-6">
+            <img className="w-15" src={assets.logo} alt="" />
+            <img
+              className="w-7"
+              onClick={() => setShowMenu(false)}
+              src={assets.cross_icon}
+              alt=""
+            />
+          </div>
+
+          <ul className="flex flex-col items-center gap-2 mt-5 px-5 font-medium text-lg">
+            <NavLink
+              className={`w-full text-center border border-gray-500 active:bg-[#5F6FFF] active:text-white rounded-sm`}
+              onClick={() => setShowMenu(false)}
+              to="/"
+            >
+              <p className="px-4 py-2 ">Home</p>
+            </NavLink>
+            <NavLink
+              className={`w-full text-center border border-gray-500 active:bg-[#5F6FFF] active:text-white rounded-sm`}
+              onClick={() => setShowMenu(false)}
+              to="/doctors"
+            >
+              <p className="px-4 py-2 ">All Doctors</p>
+            </NavLink>
+            <NavLink
+              className={`w-full text-center border border-gray-500 active:bg-[#5F6FFF] active:text-white rounded-sm`}
+              onClick={() => setShowMenu(false)}
+              to="/about"
+            >
+              <p className="px-4 py-2 ">About</p>
+            </NavLink>
+            <NavLink
+              className={`w-full text-center border border-gray-500 active:bg-[#5F6FFF] active:text-white rounded-sm`}
+              onClick={() => setShowMenu(false)}
+              to="/contact"
+            >
+              <p className="px-4 py-2 ">Contact</p>
+            </NavLink>
+          </ul>
+        </div>
       </div>
     </div>
   );
