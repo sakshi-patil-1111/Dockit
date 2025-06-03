@@ -4,7 +4,6 @@ import { AppContext } from "../context/AppContext";
 
 const Doctors = () => {
   const { speciality } = useParams();
-  console.log(speciality);
   const [filterDoc, setFilterDoc] = React.useState([]);
   const [showFilter, setShowFilter] = React.useState(false);
   const { doctors } = useContext(AppContext);
@@ -121,7 +120,7 @@ const Doctors = () => {
         <div className="w-full grid grid-cols-auto gap-4 gap-y-6">
           {filterDoc.map((item, index) => (
             <div
-              onClick={() => navigate(`/doctors/${item._id}`)}
+              onClick={() => navigate(`/appointment/${item._id}`)}
               className="border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500"
               key={index}
             >
