@@ -6,7 +6,7 @@ import { DoctorContext } from "../context/DoctorContext";
 
 const Sidebar = () => {
   const { aToken } = useContext(AdminContext);
-  //   const { dToken } = useContext(DoctorContext);
+  const { dToken } = useContext(DoctorContext);
 
   return (
     <div className="min-h-screen bg-white border-r">
@@ -61,7 +61,7 @@ const Sidebar = () => {
           </NavLink>
         </ul>
       )}
-      {/* 
+
       {dToken && (
         <ul className="text-[#515151] mt-5">
           <NavLink
@@ -100,7 +100,7 @@ const Sidebar = () => {
             <p className="hidden md:block">Profile</p>
           </NavLink>
         </ul>
-      )} */}
+      )}
     </div>
   );
 };
