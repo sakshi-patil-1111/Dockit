@@ -23,6 +23,27 @@ const MyAppointments = () => {
     "Dec",
   ];
 
+  const payOnline = async (appointmentId) => {
+    try {
+      console.log("payOnline called with appointmentId:", appointmentId);
+      const { data } = await axios.post(
+        backendUrl + "/api/user/payment-stripe",
+        { appointmentId },
+        { headers: { token } }
+      );
+
+      if (data.success) {
+        console.log(data);
+        toast.success(data.message);
+        window.location.href = data.sessionUrl;
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   const slotDateFormat = (slotDate) => {
     const dateArray = slotDate.split("_");
     return (
@@ -81,7 +102,7 @@ const MyAppointments = () => {
         My appointments
       </p>
       <div>
-        {appointments.slice(0, 3).map((item, index) => (
+        {appointments.map((item, index) => (
           <div
             className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
             key={index}
@@ -110,8 +131,16 @@ const MyAppointments = () => {
             </div>
             <div></div>
             <div className="flex flex-col gap-2 justify-end">
-              {!item.cancelled && (
-                <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-[#5F6FFF] hover:text-white transition-all duration-300">
+              {!item.cancelled && item.payment && (
+                <button className="sm:min-w-48 py-2 border rounded text-white bg-[#5F6FFF] transition-all duration-300">
+                  Paid
+                </button>
+              )}
+              {!item.cancelled && !item.payment && (
+                <button
+                  onClick={() => payOnline(item._id)}
+                  className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-[#5F6FFF] hover:text-white transition-all duration-300"
+                >
                   Pay Online
                 </button>
               )}

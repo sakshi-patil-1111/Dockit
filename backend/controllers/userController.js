@@ -5,6 +5,9 @@ import { v2 as cloudinary } from "cloudinary";
 import validator from "validator";
 import doctorModel from "../models/doctorModel.js";
 import appointmentModel from "../models/appointmentModel.js";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const registerUser = async (req, res) => {
   try {
@@ -216,6 +219,63 @@ const cancelAppointment = async (req, res) => {
   }
 };
 
+const paymentStripe = async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+    const appointmentData = await appointmentModel.findById(appointmentId);
+
+    if (!appointmentData || appointmentData.cancelled) {
+      return res.json({
+        success: false,
+        message: "Appointment cancelled or not found",
+      });
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: `Appointment with ${appointmentData.docData.name}`,
+            },
+            unit_amount: 100 * appointmentData.amount, // Stripe works with cents
+          },
+          quantity: 1,
+        },
+      ],
+      success_url: `${process.env.CLIENT_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.CLIENT_URL}/payment-failed?session_id={CHECKOUT_SESSION_ID}`,
+      metadata: { appointmentId: appointmentData._id.toString() },
+    });
+    res.json({ success: true, sessionId: session.id, sessionUrl: session.url });
+  } catch (error) {
+    console.log(error);
+    return res.json({ success: false, message: error.message });
+  }
+};
+
+const verifyPayment = async (req, res) => {
+  try {
+    const { sessionId } = req.body;
+
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    if (!session || session.payment_status !== "paid") {
+      return res.json({ success: false, message: "Payment not successful" });
+    }
+
+    const appointmentId = session.metadata.appointmentId;
+    await appointmentModel.findByIdAndUpdate(appointmentId, { payment: true });
+
+    res.json({ success: true, message: "Payment successful" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   registerUser,
   loginUser,
@@ -224,4 +284,6 @@ export {
   bookAppointment,
   listAppointment,
   cancelAppointment,
+  paymentStripe,
+  verifyPayment,
 };
